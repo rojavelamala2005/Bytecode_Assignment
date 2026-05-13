@@ -1,0 +1,340 @@
+SELECT ORDER_ID,SALES
+FROM RETAIL_ORDERS
+GROUP BY ORDER_ID,SALES
+ORDER BY SALES DESC
+LIMIT 5;
+
+SELECT CATEGORY, AVG(PROFIT) AS AVG_PROFIT
+FROM RETAIL_ORDERS
+GROUP BY CATEGORY
+HAVING  AVG(PROFIT) < 0;
+
+SELECT CITY , SUM(SALES) AS TOTAL_SALES
+FROM RETAIL_ORDERS
+GROUP BY CITY
+HAVING SUM(SALES) > 100000;
+
+SELECT *,
+DATEDIFF(SHIP_DATE , ORDER_DATE) AS DELAY_DAYS
+FROM RETAIL_ORDERS
+WHERE DATEDIFF(SHIP_DATE , ORDER_DATE) > 5;
+
+SELECT *
+FROM RETAIL_ORDERS
+WHERE ORDER_STATUS = 'RETURNED' OR PROFIT < 0 OR DISCOUNT > 1000;
+
+SELECT CUSTOMER_NAME , SALES,
+        CASE
+           WHEN SALES > 50000 THEN 'VIP'
+           WHEN SALES BETWEEN 10000 AND 50000 THEN 'REGULAR'
+           ELSE
+           'NORMAL'
+           END AS CUSTOMER_TYPE
+FROM RETAIL_ORDERS;
+
+SELECT CITY , COUNT(ORDER_ID) AS NO_OF_ORDERS
+FROM RETAIL_ORDERS
+GROUP BY CITY
+HAVING  COUNT(ORDER_ID) > 2;
+
+SELECT CATEGORY , AVG(RATING) AS AVG_RATING
+FROM RETAIL_ORDERS
+GROUP BY CATEGORY
+HAVING AVG(RATING) > 4;
+
+SELECT MONTH(ORDER_DATE) AS MONTH,SUM(SALES) AS TOTAL_SALES
+FROM RETAIL_ORDERS
+GROUP BY MONTH(ORDER_DATE)
+ORDER BY MONTH;
+
+SELECT ORDER_STATUS , COUNT(*) AS TOTAL_ORDERS
+FROM RETAIL_ORDERS
+WHERE ORDER_STATUS IN('CANCELLED' , 'PENDING')
+GROUP BY ORDER_STATUS;
+
+SELECT PRODUCT_NAME , CUSTOMER_NAME
+FROM RETAIL_ORDERS
+WHERE CUSTOMER_NAME LIKE '%KUMAR%';
+
+SELECT CUSTOMER_NAME,SUBSTRING_INDEX(CUSTOMER_NAME, ' ',1) AS FIRST_NAME
+FROM RETAIL_ORDERS;
+
+SELECT *
+FROM RETAIL_ORDERS
+WHERE DAYNAME(ORDER_DATE) IN ('SATURDAY' , 'SUNDAY');
+
+SELECT ORDER_ID , ORDER_DATE,DATE_ADD(ORDER_DATE,INTERVAL 5 DAY) AS EXPECTED_DELIVERY
+FROM RETAIL_ORDERS;
+SELECT * 
+FROM RETAIL_ORDERS
+WHERE ORDER_DATE >=CURDATE() - INTERVAL 30 DAY;
+
+SELECT ORDER_ID,ORDER_DATE,DATE_ADD(LAST_DAY(ORDER_DATE),INTERVAL 5 DAY) AS REPORTING_DATE
+FROM RETAIL_ORDERS;
+
+SELECT ORDER_ID, ORDER_DATE,SHIP_DATE
+FROM RETAIL_ORDERS
+WHERE MONTH(ORDER_DATE) <>
+MONTH( SHIP_DATE);
+
+SELECT * 
+FROM RETAIL_ORDERS
+ WHERE MONTH(ORDER_DATE) = MONTH(CURDATE() - INTERVAL 1 MONTH)
+AND YEAR(ORDER_DATE)= YEAR(CURDATE()- INTERVAL 1 MONTH);
+
+SELECT ORDER_ID, ORDER_DATE, DATEDIFF(LAST_DAY(ORDER_DATE), ORDER_DATE) AS DAYS_REMAINING
+FROM RETAIL_ORDERS;
+
+SELECT * 
+FROM RETAIL_ORDERS
+WHERE QUARTER(ORDER_DATE) = 2;
+
+SELECT ORDER_ID, ORDER_DATE,SHIP_DATE
+FROM RETAIL_ORDERS
+WHERE  DATEDIFF(SHIP_DATE,ORDER_DATE) <=3;
+
+SELECT *
+FROM RETAIL_ORDERS
+WHERE DAY(LAST_DAY(ORDER_DATE))-DAY(ORDER_DATE) <=5;
+
+SELECT ORDER_ID,SHIP_DATE,DATE_SUB(SHIP_DATE,INTERVAL 3 DAY) AS REMAINDER_DATE
+FROM RETAIL_ORDERS;
+
+SELECT ORDER_ID,ORDER_DATE,DATE_ADD(LAST_DAY(ORDER_DATE), INTERVAL 1 DAY) AS FIRST_DAY_NEXT_MONTH
+FROM RETAIL_ORDERS;
+
+SELECT ORDER_ID,ORDER_DATE,SHIP_DATE
+FROM RETAIL_ORDERS
+WHERE SHIP_DATE > DATE_ADD(ORDER_DATE, INTERVAL 5 DAY);
+
+SELECT CUSTOMER_NAME,CONCAT(LEFT(SUBSTRING_INDEX(CUSTOMER_NAME,' ',-1),1)) AS INITIALS
+FROM RETAIL_ORDERS;
+
+SELECT REGION , COUNT(*) AS TOTAL_ORDERS
+FROM RETAIL_ORDERS
+WHERE CATEGORY = "ELECTRONICS"
+GROUP BY REGION
+HAVING COUNT(*) > 2;
+
+SELECT PRODUCT_NAME, SUM(SALES) AS TOTAL_REVENUE
+FROM RETAIL_ORDERS
+GROUP BY PRODUCT_NAME
+HAVING SUM(SALES) >=50000;
+
+SELECT * 
+FROM RETAIL_ORDERS
+WHERE DISCOUNT > 1000
+AND PROFIT < 0;
+
+SELECT CITY
+FROM RETAIL_ORDERS
+WHERE ORDER_STATUS IN ('DELIVERED' , 'RETURNED')
+GROUP BY CITY
+HAVING COUNT(DISTINCT ORDER_STATUS) = 2;
+
+SELECT ORDER_ID, ORDER_STATUS,
+CASE
+WHEN ORDER_STATUS = 'CANCELLED'
+THEN 'ORDER CANCELLED'
+ELSE 'PROFIT NOT AVAILABLE'
+END AS REASON
+FROM RETAIL_ORDERS
+WHERE PROFIT IS NULL;
+
+SELECT
+    SUM(CASE WHEN category='Electronics' THEN sales ELSE 0 END) AS Electronics,
+    SUM(CASE WHEN category='Furniture' THEN sales ELSE 0 END) AS Furniture,
+    SUM(CASE WHEN category='Fashion' THEN sales ELSE 0 END) AS Fashion,
+    SUM(CASE WHEN category='Home Appliances' THEN sales ELSE 0 END) AS Home_Appliances
+FROM RETAIL_ORDERS;
+
+
+SELECT order_id,
+       customer_name,
+       DATEDIFF(ship_date, order_date) AS delivery_days,
+
+       CASE
+           WHEN DATEDIFF(ship_date, order_date) <= 3
+                THEN 'Fast Delivery'
+
+           WHEN DATEDIFF(ship_date, order_date) BETWEEN 4 AND 5
+                THEN 'Normal Delivery'
+
+           ELSE 'Delayed Delivery'
+       END AS delivery_status
+
+FROM RETAIL_ORDERS;
+
+SELECT product_name,
+       discount,
+       rating
+FROM RETAIL_ORDERS
+WHERE discount > 3000
+AND rating <= 2;
+
+
+SELECT 
+    product_name,
+    
+    category,
+    
+    COUNT(order_id) AS total_orders,
+    
+    SUM(quantity) AS total_quantity_sold,
+    
+    SUM(sales) AS total_sales,
+    
+    SUM(profit) AS total_profit
+
+FROM retail_orders
+
+GROUP BY product_name, category
+
+ORDER BY total_sales DESC
+
+LIMIT 5;
+
+SELECT 
+    city,
+    
+    SUM(sales) AS total_sales,
+    
+    SUM(profit) AS total_profit,
+    
+    ROUND((SUM(profit) / SUM(sales)) * 100, 2) 
+    AS profit_margin,
+
+    CASE 
+        WHEN (SUM(profit) / SUM(sales)) * 100 > 25 
+            THEN 'Excellent'
+            
+        WHEN (SUM(profit) / SUM(sales)) * 100 
+             BETWEEN 15 AND 25 
+            THEN 'Good'
+            
+        ELSE 'Poor'
+    END AS performance_status
+
+FROM retail_orders
+
+GROUP BY city
+
+ORDER BY profit_margin DESC;
+
+SELECT 
+    customer_name
+FROM retail_orders
+WHERE LENGTH(customer_name) > 12;
+
+SELECT 
+    CONCAT(
+        UPPER(LEFT(city,3)),
+        '_',
+        UPPER(LEFT(customer_name,4)),
+        '_',
+        order_id
+    ) AS customer_code
+FROM retail_orders;
+
+SELECT 
+    customer_name,
+    
+    LOWER(
+        REPLACE(customer_name, ' ', '.')
+    ) AS username
+FROM retail_orders;
+
+SELECT 
+    customer_name,
+    
+    CONCAT(
+        SUBSTRING_INDEX(customer_name,' ',1),
+        ' **'
+    ) AS masked_name
+FROM retail_orders;
+
+SELECT 
+    customer_name,
+    
+    SUBSTRING_INDEX(customer_name,' ',1) AS first_name,
+    
+    SUBSTRING_INDEX(customer_name,' ',-1) AS last_name
+
+FROM retail_orders;
+
+SELECT 
+    customer_name
+FROM retail_orders
+WHERE customer_name LIKE 'R%';
+
+SELECT 
+    product_name,
+    
+    SUM(profit) AS total_loss
+
+FROM retail_orders
+
+GROUP BY product_name
+
+HAVING SUM(profit) < 0
+
+ORDER BY total_loss ASC;
+
+SELECT 
+    customer_name,
+    rating,
+
+    CASE
+        WHEN rating = 5 THEN 'Excellent'
+        WHEN rating >= 3 THEN 'Good'
+        WHEN rating < 3 THEN 'Poor'
+        ELSE 'No Rating'
+    END AS feedback_label
+
+FROM retail_orders;
+
+SELECT 
+    REGION
+
+FROM retail_orders
+
+GROUP BY REGION
+
+HAVING 
+    SUM(CASE WHEN order_status = 'Delivered' THEN 1 ELSE 0 END) > 0
+    AND
+    SUM(CASE WHEN order_status = 'Returned' THEN 1 ELSE 0 END) > 0;
+    
+    SELECT 
+    category,
+
+    SUM(CASE WHEN MONTH(order_date)=1 THEN sales ELSE 0 END) AS Jan_Sales,
+    SUM(CASE WHEN MONTH(order_date)=2 THEN sales ELSE 0 END) AS Feb_Sales,
+    SUM(CASE WHEN MONTH(order_date)=3 THEN sales ELSE 0 END) AS Mar_Sales,
+    SUM(CASE WHEN MONTH(order_date)=4 THEN sales ELSE 0 END) AS Apr_Sales
+
+FROM retail_orders
+GROUP BY category;
+
+SELECT 
+    category,
+    
+    MAX(sales) AS highest_sales,
+    
+    MIN(sales) AS lowest_sales
+
+FROM retail_orders
+
+GROUP BY category;
+
+SELECT 
+    order_id,
+    
+    IFNULL(profit,0) AS profit
+
+FROM retail_orders;
+    
+    
+
+
+
